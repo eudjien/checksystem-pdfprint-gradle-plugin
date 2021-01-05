@@ -1,0 +1,58 @@
+plugins {
+    id 'java-gradle-plugin'
+    id 'maven-publish'
+	id 'com.gradle.plugin-publish' version '0.12.0'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13'
+}
+
+group = "ru.clevertec.checksystem"
+version = '1.0'
+
+gradlePlugin {
+    plugins {
+        pdfprint {
+            id = 'ru.clevertec.checksystem.plugin.pdfprint'
+            implementationClass = 'ru.clevertec.checksystem.plugin.pdfprint.PdfPrintPlugin'
+        }
+    }
+}
+
+pluginBundle {
+  // These settings are set for the whole plugin bundle
+  website = 'http://clevertec.ru'
+  vcsUrl = 'https://github.com/evgnpn/checksystem-pdfprint-plugin'
+
+  // tags and description can be set for the whole bundle here, but can also
+  // be set / overridden in the config for specific plugins
+  description = 'Gradle plugin of checksystem for printing into pdf files'
+
+  // The plugins block can contain multiple plugin entries.
+  //
+  // The name for each plugin block below (greetingsPlugin, goodbyePlugin)
+  // does not affect the plugin configuration, but they need to be unique
+  // for each plugin.
+
+  // Plugin config blocks can set the id, displayName, version, description
+  // and tags for each plugin.
+
+  // id and displayName are mandatory.
+  // If no version is set, the project version will be used.
+  // If no tags or description are set, the tags or description from the
+  // pluginBundle block will be used, but they must be set in one of the
+  // two places.
+
+  plugins {
+    pdfprint {
+        displayName = 'PDF printing plugin for CheckSystem'
+		tags = ['checksystem', 'pdf', 'printing', 'clevertec', 'plugin']
+		version = '1.0'
+    }
+  }
+}
