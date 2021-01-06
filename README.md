@@ -1,4 +1,4 @@
-### Build & run
+### checksystem-pdfprint-plugin
 
 > Это gradle плагин для [checksystem](https://github.com/evgnpn/checksystem), который печатает чеки в формате PDF
 
@@ -9,18 +9,20 @@ gradlew build
 gradlew publishToMavenLocal
 ```
 
-**Add plugin to 'gradle.build' file**
+**Run**
+
+```
+gradlew pdfprint
+```
+
+**Example 'gradle.build'**
 
 ```
 plugins {
     ...
     id 'ru.clevertec.checksystem.plugin.pdfprint' version "1.0"
 }
-```
 
-**Settings example**
-
-```
 // With template or not
 def useTemplate = true;
 
@@ -40,10 +42,3 @@ if (useTemplate) {
 pdfPrintSettings.outputPdfPath = Paths.get("$rootDir", "CHECKS_" + (useTemplate ? "WITH" : "WITHOUT") + "_TEMPLATE.pdf")
 
 ```
-
-**Run**
-
-```
-gradlew pdfprint
-```
-	
