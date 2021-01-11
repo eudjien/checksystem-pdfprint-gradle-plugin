@@ -57,6 +57,7 @@ public class PdfPrintPlugin implements Plugin<Project> {
         }
     }
 
+    @Override
     public void apply(Project project) {
 
         var extension = project.getExtensions()
