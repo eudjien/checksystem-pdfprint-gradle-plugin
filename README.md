@@ -20,11 +20,11 @@ gradlew pdfprint
 ```
 plugins {
     ...
-    id 'ru.clevertec.checksystem.plugin.pdfprint' version "1.0"
+    id 'ru.clevertec.checksystem.plugin.pdfprint' version "1.0.2"
 }
 
 // With template or not
-def useTemplate = true;
+def templateIsUsed = true;
 
 // Input setup
 pdfPrintSettings.inputFilePath = Paths.get("$rootDir", "examples", "checks_serialized.json")
@@ -32,7 +32,7 @@ pdfPrintSettings.inputFileFormat = "json"
 
 // Template setup
 if (useTemplate) {
-    pdfPrintSettings.useTemplate = useTemplate;
+    pdfPrintSettings.templateIsUsed = useTemplate;
     pdfPrintSettings.templateUrl = "https://github.com/stebadmitriy/files/raw/main/Clevertec_Template.pdf"
     pdfPrintSettings.topOffset = 94; // На сколько чек по отношению к шаблону будет смещен вниз
     pdfPrintSettings.templateOutput = Paths.get("$rootDir", "resources", "templates", "Clevertec_Template.pdf")

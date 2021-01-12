@@ -6,7 +6,6 @@ import org.gradle.api.tasks.JavaExec;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class PdfPrintPlugin implements Plugin<Project> {
@@ -15,11 +14,12 @@ public class PdfPrintPlugin implements Plugin<Project> {
     private final static String RUN_TASK_NAME = "run";
     private final static String EXTENSION_NAME = "pdfPrintSettings";
     private final static String PRINT_TASK_NAME = "pdfprint";
+    private final static String DOWNLOAD_FILE_TASK = "downloadFile";
 
     private static void showPrintInfo(PdfPrintPluginExtension extension) {
 
         System.out.println("PDF print info:");
-        if (extension.useTemplate) {
+        if (extension.templateIsUsed) {
             System.out.println("  Template url:         " + extension.templateUrl);
             System.out.println("  Template output path: " + extension.templateOutput);
             System.out.println("  Template top offset:  " + extension.topOffset);
@@ -39,7 +39,7 @@ public class PdfPrintPlugin implements Plugin<Project> {
         args.add("-file-print-format=pdf");
         args.add("-file-print-path=" + extension.outputPdfPath);
 
-        if (extension.useTemplate) {
+        if (extension.templateIsUsed) {
             args.add("-file-print-pdf-template=" + extension.templateOutput + "|" + extension.topOffset);
         }
 
@@ -48,7 +48,7 @@ public class PdfPrintPlugin implements Plugin<Project> {
 
     private static void setTemplateOutputOrDefault(PdfPrintPluginExtension extension, Project project) {
 
-        if (extension.useTemplate) {
+        if (extension.templateIsUsed) {
             if (extension.templateOutput == null || extension.templateOutput.isBlank()) {
                 extension.templateOutput =
                         Paths.get(project.getRootDir().toString(), "template.pdf")
@@ -68,7 +68,7 @@ public class PdfPrintPlugin implements Plugin<Project> {
 
         var dlFileTaskProvider = project.getTasks()
                 .register(
-                        "downloadFile",
+                        DOWNLOAD_FILE_TASK,
                         DownloadFileTask.class,
                         task -> {
                             task.url = extension.templateUrl;
@@ -79,13 +79,13 @@ public class PdfPrintPlugin implements Plugin<Project> {
                 .getOrDefault(CHILD_CLI_PROJECT_NAME, project);
 
         var runTaskProvider = projectWithRunTask
-                .getTasks().named(RUN_TASK_NAME, JavaExec.class, t -> {
+                .getTasks().named(RUN_TASK_NAME, JavaExec.class, task -> {
                     showPrintInfo(extension);
-                    t.setArgs(createArgs(extension));
+                    task.setArgs(createArgs(extension));
                 });
 
         project.getTasks().register(PRINT_TASK_NAME, task -> {
-            if (extension.useTemplate) {
+            if (extension.templateIsUsed) {
                 task.dependsOn(dlFileTaskProvider);
             }
             task.dependsOn(runTaskProvider);
