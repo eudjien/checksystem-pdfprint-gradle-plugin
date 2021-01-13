@@ -20,7 +20,7 @@ gradlew pdfprint
 ```
 plugins {
     ...
-    id 'ru.clevertec.checksystem.plugin.pdfprint' version "1.0.2"
+    id 'ru.clevertec.checksystem.plugin.pdfprint' version "1.0.3"
 }
 
 // With template or not

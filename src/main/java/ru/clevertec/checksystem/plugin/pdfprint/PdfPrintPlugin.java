@@ -78,17 +78,15 @@ public class PdfPrintPlugin implements Plugin<Project> {
         var projectWithRunTask = project.getChildProjects()
                 .getOrDefault(CHILD_CLI_PROJECT_NAME, project);
 
-        var runTaskProvider = projectWithRunTask
-                .getTasks().named(RUN_TASK_NAME, JavaExec.class, task -> {
-                    showPrintInfo(extension);
-                    task.setArgs(createArgs(extension));
-                });
-
         project.getTasks().register(PRINT_TASK_NAME, task -> {
             if (extension.templateIsUsed) {
                 task.dependsOn(dlFileTaskProvider);
             }
-            task.dependsOn(runTaskProvider);
+            task.dependsOn(projectWithRunTask
+                    .getTasks().named(RUN_TASK_NAME, JavaExec.class, javaExec -> {
+                        showPrintInfo(extension);
+                        javaExec.setArgs(createArgs(extension));
+                    }));
         });
     }
 }
