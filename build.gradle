@@ -8,7 +8,7 @@ repositories {
     jcenter()
 }
 
-def pluginVersion = '1.0.3'
+def pluginVersion = '1.1.0'
 
 group = "ru.clevertec.checksystem"
 version = pluginVersion
@@ -25,10 +25,10 @@ gradlePlugin {
 pluginBundle {
   website = 'http://clevertec.ru'
   vcsUrl = 'https://github.com/evgnpn/checksystem-pdfprint-plugin'
-  description = 'Gradle plugin of checksystem for printing into pdf files'
+  description = 'PDF printing plugin for checksystem'
   plugins {
     pdfprint {
-        displayName = 'PDF printing plugin for CheckSystem'
+        displayName = 'PDF printing plugin for checksystem'
 		tags = ['checksystem', 'pdf', 'printing', 'clevertec', 'plugin']
 		version = pluginVersion
     }

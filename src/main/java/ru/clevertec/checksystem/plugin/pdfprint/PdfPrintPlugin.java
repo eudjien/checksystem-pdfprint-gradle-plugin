@@ -40,7 +40,9 @@ public class PdfPrintPlugin implements Plugin<Project> {
         args.add("-file-print-path=" + extension.outputPdfPath);
 
         if (extension.templateIsUsed) {
-            args.add("-file-print-pdf-template=" + extension.templateOutput + "|" + extension.topOffset);
+            args.add("-file-print-pdf-template=1");
+            args.add("-file-print-pdf-template-path=" + extension.templateOutput);
+            args.add("-file-print-pdf-template-offset=" + extension.topOffset);
         }
 
         return args;
