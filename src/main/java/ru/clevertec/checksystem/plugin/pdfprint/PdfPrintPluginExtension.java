@@ -8,4 +8,5 @@ public class PdfPrintPluginExtension {
     public String inputFileFormat;
     public String inputFilePath;
     public String outputPdfPath;
+    public String runTaskName = "run";
 }

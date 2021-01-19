@@ -8,7 +8,7 @@ repositories {
     jcenter()
 }
 
-def pluginVersion = '1.1.1'
+def pluginVersion = '1.1.2'
 
 group = "ru.clevertec.checksystem"
 version = pluginVersion

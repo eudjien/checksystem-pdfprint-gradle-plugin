@@ -11,7 +11,6 @@ import java.util.List;
 public class PdfPrintPlugin implements Plugin<Project> {
 
     private final static String CHILD_CLI_PROJECT_NAME = "checksystem-cli";
-    private final static String RUN_TASK_NAME = "bootRun";
     private final static String EXTENSION_NAME = "pdfPrintSettings";
     private final static String PRINT_TASK_NAME = "pdfprint";
     private final static String DOWNLOAD_FILE_TASK = "downloadFile";
@@ -42,7 +41,7 @@ public class PdfPrintPlugin implements Plugin<Project> {
                 task.dependsOn(dlFileTaskProvider);
             }
             task.dependsOn(projectWithRunTask
-                    .getTasks().named(RUN_TASK_NAME, JavaExec.class, javaExec -> {
+                    .getTasks().named(extension.runTaskName, JavaExec.class, javaExec -> {
                         showPrintInfo(extension);
                         javaExec.setArgs(createArgs(extension));
                     }));
