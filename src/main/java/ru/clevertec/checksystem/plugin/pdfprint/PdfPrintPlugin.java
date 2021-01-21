@@ -4,13 +4,12 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.tasks.JavaExec;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PdfPrintPlugin implements Plugin<Project> {
 
-    private final static String EXTENSION_NAME = "pdfPrintSettings";
+    private final static String EXTENSION_NAME = "pdfprint";
     private final static String PRINT_TASK_NAME = "pdfprint";
     private final static String DOWNLOAD_FILE_TASK = "downloadTemplate";
 
@@ -41,6 +40,10 @@ public class PdfPrintPlugin implements Plugin<Project> {
             }
 
             task.dependsOn(runTask);
+
+            task.doLast(a -> {
+                System.out.println("[" + PRINT_TASK_NAME + "] Success! Check printed into " + ext.outputPdfPath);
+            });
         });
     }
 

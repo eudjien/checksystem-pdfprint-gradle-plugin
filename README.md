@@ -2,13 +2,6 @@
 
 > Это gradle плагин для [checksystem](https://github.com/evgnpn/checksystem), который печатает чеки в формате PDF
 
-**Publish to maven local**
-
-```
-gradlew build 
-gradlew publishToMavenLocal
-```
-
 **Run**
 
 ```
