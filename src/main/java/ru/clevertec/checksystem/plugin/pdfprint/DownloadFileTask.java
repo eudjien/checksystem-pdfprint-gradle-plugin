@@ -17,8 +17,6 @@ public class DownloadFileTask extends DefaultTask {
     @TaskAction
     public void run() {
         System.out.println("Downloading file...");
-        System.out.println("  From: " + url);
-        System.out.println("  Into: " + outputPath);
 
         try {
             downloadFile(outputPath);

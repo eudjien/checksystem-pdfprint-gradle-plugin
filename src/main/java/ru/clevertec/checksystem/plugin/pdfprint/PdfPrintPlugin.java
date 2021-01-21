@@ -1,7 +1,7 @@
 package ru.clevertec.checksystem.plugin.pdfprint;
 
-import org.gradle.api.Project;
 import org.gradle.api.Plugin;
+import org.gradle.api.Project;
 import org.gradle.api.tasks.JavaExec;
 
 import java.nio.file.Paths;
@@ -10,41 +10,37 @@ import java.util.List;
 
 public class PdfPrintPlugin implements Plugin<Project> {
 
-    private final static String CHILD_CLI_PROJECT_NAME = "checksystem-cli";
     private final static String EXTENSION_NAME = "pdfPrintSettings";
     private final static String PRINT_TASK_NAME = "pdfprint";
-    private final static String DOWNLOAD_FILE_TASK = "downloadFile";
+    private final static String DOWNLOAD_FILE_TASK = "downloadTemplate";
 
     @Override
     public void apply(Project project) {
 
-        var extension = project.getExtensions()
-                .create(EXTENSION_NAME, PdfPrintPluginExtension.class);
+        project.getPlugins().apply("application");
 
-        setTemplateOutputOrDefault(extension, project);
-        project.evaluationDependsOnChildren();
+        var ext = project.getExtensions().create(EXTENSION_NAME, PdfPrintPluginExtension.class);
 
-        var dlFileTaskProvider = project.getTasks()
-                .register(
-                        DOWNLOAD_FILE_TASK,
-                        DownloadFileTask.class,
-                        task -> {
-                            task.url = extension.templateUrl;
-                            task.outputPath = extension.templateOutput;
-                        });
+        var downloadFileTaskTaskProvider
+                = project.getTasks().register(DOWNLOAD_FILE_TASK, DownloadFileTask.class, task -> {
+            task.doFirst(a -> {
+                task.url = ext.templateUrl;
+                task.outputPath = ext.templateOutput;
+            });
+        });
 
-        var projectWithRunTask = project.getChildProjects()
-                .getOrDefault(CHILD_CLI_PROJECT_NAME, project);
+        var runTask = project.getTasks().named(ext.runTaskName, JavaExec.class, javaExec ->
+                javaExec.doFirst(a -> javaExec.setArgs(createArgs(ext))));
 
         project.getTasks().register(PRINT_TASK_NAME, task -> {
-            if (extension.templateIsUsed) {
-                task.dependsOn(dlFileTaskProvider);
+
+            showPrintInfo(ext);
+
+            if (ext.templateIsUsed) {
+                task.dependsOn(downloadFileTaskTaskProvider);
             }
-            task.dependsOn(projectWithRunTask
-                    .getTasks().named(extension.runTaskName, JavaExec.class, javaExec -> {
-                        showPrintInfo(extension);
-                        javaExec.setArgs(createArgs(extension));
-                    }));
+
+            task.dependsOn(runTask);
         });
     }
 
@@ -59,17 +55,6 @@ public class PdfPrintPlugin implements Plugin<Project> {
         System.out.println("  Input file format:    " + extension.inputFileFormat);
         System.out.println("  Input file path:      " + extension.inputFilePath);
         System.out.println("  Output check path:    " + extension.outputPdfPath);
-    }
-
-    private static void setTemplateOutputOrDefault(PdfPrintPluginExtension extension, Project project) {
-
-        if (extension.templateIsUsed) {
-            if (extension.templateOutput == null || extension.templateOutput.isBlank()) {
-                extension.templateOutput =
-                        Paths.get(project.getRootDir().toString(), "template.pdf")
-                                .toString();
-            }
-        }
     }
 
     private static List<String> createArgs(PdfPrintPluginExtension extension) {
