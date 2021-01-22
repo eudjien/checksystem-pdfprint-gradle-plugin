@@ -35,29 +35,30 @@ public class PdfPrintPlugin implements Plugin<Project> {
 
             showPrintInfo(ext);
 
-            if (ext.templateIsUsed) {
+            if (ext.withTemplate) {
                 task.dependsOn(downloadFileTaskTaskProvider);
             }
 
             task.dependsOn(runTask);
 
-            task.doLast(a -> {
-                System.out.println("[" + PRINT_TASK_NAME + "] Success! Check printed into " + ext.outputPdfPath);
-            });
+            task.doLast(a ->
+                    System.out.println("[" + PRINT_TASK_NAME + "] Success! Check printed into " + ext.outputPdfPath));
         });
     }
 
     private static void showPrintInfo(PdfPrintPluginExtension extension) {
 
         System.out.println("PDF print info:");
-        if (extension.templateIsUsed) {
-            System.out.println("  Template url:         " + extension.templateUrl);
-            System.out.println("  Template output path: " + extension.templateOutput);
-            System.out.println("  Template top offset:  " + extension.topOffset);
+        System.out.println("-------------------------");
+        if (extension.withTemplate) {
+            System.out.println("Template url:         " + extension.templateUrl);
+            System.out.println("Template output path: " + extension.templateOutput);
+            System.out.println("Template top offset:  " + extension.topOffset);
         }
-        System.out.println("  Input file format:    " + extension.inputFileFormat);
-        System.out.println("  Input file path:      " + extension.inputFilePath);
-        System.out.println("  Output check path:    " + extension.outputPdfPath);
+        System.out.println("Input file format:    " + extension.inputFileFormat);
+        System.out.println("Input file path:      " + extension.inputFilePath);
+        System.out.println("Output check path:    " + extension.outputPdfPath);
+        System.out.println("-------------------------");
     }
 
     private static List<String> createArgs(PdfPrintPluginExtension extension) {
@@ -70,7 +71,7 @@ public class PdfPrintPlugin implements Plugin<Project> {
         args.add("-file-print-format=pdf");
         args.add("-file-print-path=" + extension.outputPdfPath);
 
-        if (extension.templateIsUsed) {
+        if (extension.withTemplate) {
             args.add("-file-print-pdf-template=1");
             args.add("-file-print-pdf-template-path=" + extension.templateOutput);
             args.add("-file-print-pdf-template-offset=" + extension.topOffset);
