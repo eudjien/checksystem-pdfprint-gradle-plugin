@@ -1,12 +1,11 @@
 package ru.clevertec.checksystem.plugin.pdfprint;
 
 public class PdfPrintPluginExtension {
-    public boolean withTemplate;
+    public boolean hasTemplate;
     public String templateUrl;
-    public int topOffset;
-    public String templateOutput;
-    public String inputFileFormat;
-    public String inputFilePath;
-    public String outputPdfPath;
-    public String runTaskName = "run";
+    public int templateTopOffset;
+    public String templateOutputPath;
+    public String inputFormat;
+    public String inputPath;
+    public String outputPath;
 }

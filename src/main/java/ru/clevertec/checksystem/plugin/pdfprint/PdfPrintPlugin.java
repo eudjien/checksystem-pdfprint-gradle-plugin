@@ -9,9 +9,11 @@ import java.util.List;
 
 public class PdfPrintPlugin implements Plugin<Project> {
 
-    private final static String EXTENSION_NAME = "pdfprint";
-    private final static String PRINT_TASK_NAME = "pdfprint";
-    private final static String DOWNLOAD_FILE_TASK = "downloadTemplate";
+    private final static String RUN_TASK_NAME = "bootRun";
+    private final static String EXTENSION_NAME = "pdfPrint";
+    private final static String PRINT_TASK_NAME = "pdfPrint";
+    private final static String DOWNLOAD_FILE_TASK = "downloadPdfTemplate";
+    private final static String PRINT_INFO_TASK = "pdfPrintInfo";
 
     @Override
     public void apply(Project project) {
@@ -20,61 +22,50 @@ public class PdfPrintPlugin implements Plugin<Project> {
 
         var ext = project.getExtensions().create(EXTENSION_NAME, PdfPrintPluginExtension.class);
 
-        var downloadFileTaskTaskProvider
-                = project.getTasks().register(DOWNLOAD_FILE_TASK, DownloadFileTask.class, task -> {
-            task.doFirst(a -> {
-                task.url = ext.templateUrl;
-                task.outputPath = ext.templateOutput;
-            });
-        });
+        var pdfPrintInfoTaskProvider = project.getTasks().register(
+                PRINT_INFO_TASK, PdfPrintInfoTask.class, pdfPrintInfoTask -> {
+                    pdfPrintInfoTask.extension = ext;
+                });
 
-        var runTask = project.getTasks().named(ext.runTaskName, JavaExec.class, javaExec ->
+        var downloadFileTaskProvider = project.getTasks().register(
+                DOWNLOAD_FILE_TASK, DownloadFileTask.class, downloadFileTask -> {
+                    downloadFileTask.url = ext.templateUrl;
+                    downloadFileTask.outputPath = ext.templateOutputPath;
+                });
+        downloadFileTaskProvider.configure(a -> a.mustRunAfter(pdfPrintInfoTaskProvider));
+
+        var runTaskProvider = project.getTasks().named(RUN_TASK_NAME, JavaExec.class, javaExec ->
                 javaExec.doFirst(a -> javaExec.setArgs(createArgs(ext))));
+        runTaskProvider.configure(t -> t.mustRunAfter(downloadFileTaskProvider));
 
-        project.getTasks().register(PRINT_TASK_NAME, task -> {
+        project.getTasks().register(PRINT_TASK_NAME, pdfPrintTask -> {
 
-            showPrintInfo(ext);
+            pdfPrintTask.dependsOn(pdfPrintInfoTaskProvider);
 
-            if (ext.withTemplate) {
-                task.dependsOn(downloadFileTaskTaskProvider);
-            }
+            if (ext.hasTemplate)
+                pdfPrintTask.dependsOn(downloadFileTaskProvider);
 
-            task.dependsOn(runTask);
+            pdfPrintTask.dependsOn(runTaskProvider);
 
-            task.doLast(a ->
-                    System.out.println("[" + PRINT_TASK_NAME + "] Success! Check printed into " + ext.outputPdfPath));
+            pdfPrintTask.doLast(a -> System.out.println(
+                    "[" + PRINT_TASK_NAME + "] Success! Check printed into " + ext.outputPath));
         });
-    }
-
-    private static void showPrintInfo(PdfPrintPluginExtension extension) {
-
-        System.out.println("PDF print info:");
-        System.out.println("-------------------------");
-        if (extension.withTemplate) {
-            System.out.println("Template url:         " + extension.templateUrl);
-            System.out.println("Template output path: " + extension.templateOutput);
-            System.out.println("Template top offset:  " + extension.topOffset);
-        }
-        System.out.println("Input file format:    " + extension.inputFileFormat);
-        System.out.println("Input file path:      " + extension.inputFilePath);
-        System.out.println("Output check path:    " + extension.outputPdfPath);
-        System.out.println("-------------------------");
     }
 
     private static List<String> createArgs(PdfPrintPluginExtension extension) {
 
         var args = new ArrayList<String>();
-        args.add("-mode=file-deserialize");
-        args.add("-file-deserialize-format=" + extension.inputFileFormat);
-        args.add("-file-deserialize-path=" + extension.inputFilePath);
-        args.add("-file-print=1");
-        args.add("-file-print-format=pdf");
-        args.add("-file-print-path=" + extension.outputPdfPath);
+        args.add("-i=deserialize");
+        args.add("-deserialize-format=" + extension.inputFormat);
+        args.add("-deserialize-path=" + extension.inputPath);
+        args.add("-print=true");
+        args.add("-print-format=pdf");
+        args.add("-print-path=" + extension.outputPath);
 
-        if (extension.withTemplate) {
-            args.add("-file-print-pdf-template=1");
-            args.add("-file-print-pdf-template-path=" + extension.templateOutput);
-            args.add("-file-print-pdf-template-offset=" + extension.topOffset);
+        if (extension.hasTemplate) {
+            args.add("-print-pdf-template=1");
+            args.add("-print-pdf-template-path=" + extension.templateOutputPath);
+            args.add("-print-pdf-template-offset=" + extension.templateTopOffset);
         }
 
         return args;

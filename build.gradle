@@ -8,14 +8,14 @@ repositories {
     jcenter()
 }
 
-def pluginVersion = '1.1.7'
+def pluginVersion = '1.2.0'
 
 group = "ru.clevertec.checksystem"
 version = pluginVersion
 
 gradlePlugin {
     plugins {
-        pdfprint {
+        pdfPrint {
             id = 'ru.clevertec.checksystem.plugin.pdfprint'
             implementationClass = 'ru.clevertec.checksystem.plugin.pdfprint.PdfPrintPlugin'
         }
@@ -24,10 +24,10 @@ gradlePlugin {
 
 pluginBundle {
   website = 'http://clevertec.ru'
-  vcsUrl = 'https://github.com/evgnpn/checksystem-pdfprint-plugin'
+  vcsUrl = 'https://github.com/evgnpn/gradle-checksystem-pdfprint-plugin'
   description = 'PDF printing plugin for checksystem'
   plugins {
-    pdfprint {
+    pdfPrint {
         displayName = 'PDF printing plugin for checksystem'
 		tags = ['checksystem', 'pdf', 'printing', 'clevertec', 'plugin']
 		version = pluginVersion

@@ -13,25 +13,20 @@ gradlew pdfprint
 ```groovy
 plugins {
     // ...
-    id 'ru.clevertec.checksystem.plugin.pdfprint' version "1.1.7"
+    id 'ru.clevertec.checksystem.plugin.pdfprint' version "1.2.0"
 }
 
-// With template or not
-def withTemplate = true;
+def hasPdfTemplate = true
 
-pdfprint {
+pdfPrint {
+    inputPath = "$rootDir\\..\\examples\\serialized.json"
+    inputFormat = "json"
+    outputPath = "$rootDir\\resources\\checks.pdf"
 
-    // Input
-    pdfprint.inputFilePath = Paths.get("$rootDir", "examples", "checks_serialized.json")
-    pdfprint.inputFileFormat = "json"
-    
-    // Output
-    pdfprint.outputPdfPath = Paths.get("$rootDir", "CHECKS_" + (useTemplate ? "WITH" : "WITHOUT") + "_TEMPLATE.pdf")
-    
-    // Template
-    pdfprint.templateIsUsed = withTemplate;
-    pdfprint.templateUrl = "https://github.com/stebadmitriy/files/raw/main/Clevertec_Template.pdf"
-    pdfprint.topOffset = 94; // На сколько чек по отношению к шаблону будет смещен вниз
-    pdfprint.templateOutput = Paths.get("$rootDir", "resources", "templates", "Clevertec_Template.pdf")
+    hasTemplate = hasPdfTemplate
+    templateUrl = "https://github.com/stebadmitriy/files/raw/main/Clevertec_Template.pdf"
+    templateTopOffset = 94
+    templateOutputPath = "$rootDir\\resources\\templates\\Clevertec_Template.pdf"
 }
+
 ```
