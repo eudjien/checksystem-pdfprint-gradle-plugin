@@ -2,7 +2,9 @@ package ru.clevertec.checksystem.plugin.pdfprint;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.api.tasks.JavaExec;
+import org.gradle.api.tasks.TaskProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,36 +22,68 @@ public class PdfPrintPlugin implements Plugin<Project> {
 
         project.getPlugins().apply("application");
 
-        var ext = project.getExtensions().create(EXTENSION_NAME, PdfPrintPluginExtension.class);
+        var extension = project.getExtensions()
+                .create(EXTENSION_NAME, PdfPrintPluginExtension.class);
 
-        var pdfPrintInfoTaskProvider = project.getTasks().register(
-                PRINT_INFO_TASK, PdfPrintInfoTask.class, pdfPrintInfoTask -> {
-                    pdfPrintInfoTask.extension = ext;
-                });
+        var runTask = project.getTasks().getByName(RUN_TASK_NAME);
 
-        var downloadFileTaskProvider = project.getTasks().register(
-                DOWNLOAD_FILE_TASK, DownloadFileTask.class, downloadFileTask -> {
-                    downloadFileTask.url = ext.templateUrl;
-                    downloadFileTask.outputPath = ext.templateOutputPath;
-                });
-        downloadFileTaskProvider.configure(a -> a.mustRunAfter(pdfPrintInfoTaskProvider));
+        var infoProvider = registerInfoTask(project, extension);
+        var downloadProvider = registerDownloadTask(project, extension, infoProvider);
 
-        var runTaskProvider = project.getTasks().named(RUN_TASK_NAME, JavaExec.class, javaExec ->
-                javaExec.doFirst(a -> javaExec.setArgs(createArgs(ext))));
-        runTaskProvider.configure(t -> t.mustRunAfter(downloadFileTaskProvider));
+        registerPrintTask(project, extension, runTask, infoProvider, downloadProvider);
+    }
 
-        project.getTasks().register(PRINT_TASK_NAME, pdfPrintTask -> {
+    private static void registerPrintTask(
+            Project project,
+            PdfPrintPluginExtension extension,
+            Task runTask,
+            TaskProvider<PdfPrintInfoTask> infoProvider,
+            TaskProvider<DownloadFileTask> downloadProvider) {
 
-            pdfPrintTask.dependsOn(pdfPrintInfoTaskProvider);
+        project.getTasks().register(PRINT_TASK_NAME, t -> {
 
-            if (ext.hasTemplate)
-                pdfPrintTask.dependsOn(downloadFileTaskProvider);
+            if (extension.showInfo)
+                t.dependsOn(infoProvider);
 
-            pdfPrintTask.dependsOn(runTaskProvider);
+            if (extension.hasTemplate)
+                t.dependsOn(downloadProvider);
 
-            pdfPrintTask.doLast(a -> System.out.println(
-                    "[" + PRINT_TASK_NAME + "] Success! Check printed into " + ext.outputPath));
+            t.dependsOn(configureRunTask(runTask, extension, downloadProvider));
+            t.doLast(a -> System.out.println(successPrintMessage(extension)));
         });
+    }
+
+    private static TaskProvider<PdfPrintInfoTask> registerInfoTask(
+            Project project, PdfPrintPluginExtension extension) {
+
+        return project.getTasks().register(
+                PRINT_INFO_TASK, PdfPrintInfoTask.class, pdfPrintInfoTask -> pdfPrintInfoTask.extension = extension);
+    }
+
+    private static TaskProvider<DownloadFileTask> registerDownloadTask(
+            Project project, PdfPrintPluginExtension extension, TaskProvider<? extends Task> beforeTask) {
+
+        var provider = project.getTasks().register(
+                DOWNLOAD_FILE_TASK, DownloadFileTask.class, downloadFileTask -> {
+                    downloadFileTask.url = extension.templateUrl;
+                    downloadFileTask.outputPath = extension.templateOutputPath;
+                });
+
+        if (beforeTask != null)
+            provider.configure(a -> a.mustRunAfter(beforeTask));
+
+        return provider;
+    }
+
+    private static Task configureRunTask(
+            Task runTask, PdfPrintPluginExtension extension, TaskProvider<? extends Task> beforeTask) {
+
+        return runTask.doFirst(t -> ((JavaExec) t).setArgs(createArgs(extension)))
+                .mustRunAfter(beforeTask);
+    }
+
+    private static String successPrintMessage(PdfPrintPluginExtension extension) {
+        return "[" + PRINT_TASK_NAME + "] Success! Check printed into " + extension.outputPath;
     }
 
     private static List<String> createArgs(PdfPrintPluginExtension extension) {

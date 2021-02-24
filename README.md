@@ -2,10 +2,12 @@
 
 > Это gradle плагин для [checksystem](https://github.com/evgnpn/checksystem), который печатает чеки в формате PDF
 
-**Run**
+**Tasks**
 
 ```
-gradlew pdfprint
+gradlew pdfPrint // скачать шаблон затем произвести печать
+gradlew pdfPrintInfo // вывести конфигурацию плагина (путь входного или выходного файла, url шаблона - если он есть, и т.п.)
+gradlew downloadPdfTemplate // скачать шаблон (без печати)
 ```
 
 **Example 'gradle.build'**
@@ -13,12 +15,15 @@ gradlew pdfprint
 ```groovy
 plugins {
     // ...
-    id 'ru.clevertec.checksystem.plugin.pdfprint' version "1.2.0"
+    id 'ru.clevertec.checksystem.plugin.pdfprint' version "1.3.0"
 }
 
 def hasPdfTemplate = true
 
 pdfPrint {
+    
+    showInfo = true
+    
     inputPath = "$rootDir\\..\\examples\\serialized.json"
     inputFormat = "json"
     outputPath = "$rootDir\\resources\\checks.pdf"

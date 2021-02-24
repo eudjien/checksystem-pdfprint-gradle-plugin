@@ -8,4 +8,5 @@ public class PdfPrintPluginExtension {
     public String inputFormat;
     public String inputPath;
     public String outputPath;
+    public boolean showInfo;
 }

@@ -1,14 +1,7 @@
 package ru.clevertec.checksystem.plugin.pdfprint;
 
 import org.gradle.api.DefaultTask;
-import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
-
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 public class PdfPrintInfoTask extends DefaultTask {
 
